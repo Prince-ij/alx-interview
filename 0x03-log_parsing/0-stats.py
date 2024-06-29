@@ -1,62 +1,54 @@
 #!/usr/bin/python3
-"""
-Script to read stdin line by line and compute metrics:
-- Total file size
-- Number of lines by status code
-"""
 
 import sys
 
 
-def print_stats(total_size, status_codes):
+def print_msg(dict_sc, total_file_size):
     """
-    Prints the computed statistics.
-    :param total_size: The total size of files.
-    :type total_size: int
-    :param status_codes: Dictionary of status codes and their counts.
-    :type status_codes: dict
+    Method to print
+    Args:
+        dict_sc: dict of status codes
+        total_file_size: total of the file
+    Returns:
+        Nothing
     """
-    print(f"File size: {total_size}")
-    for code in sorted(status_codes):
-        if status_codes[code]:
-            print(f"{code}: {status_codes[code]}")
+
+    print("File size: {}".format(total_file_size))
+    for key, val in sorted(dict_sc.items()):
+        if val != 0:
+            print("{}: {}".format(key, val))
 
 
-def log_parsing():
-    """
-    Reads stdin line by line and computes metrics.
-    """
-    total_size = 0
-    status_codes = {200: 0, 301: 0, 400: 0, 401: 0, 403: 0, 404: 0,
-                    405: 0, 500: 0}
-    line_count = 0
+total_file_size = 0
+code = 0
+counter = 0
+dict_sc = {"200": 0,
+           "301": 0,
+           "400": 0,
+           "401": 0,
+           "403": 0,
+           "404": 0,
+           "405": 0,
+           "500": 0}
 
-    try:
-        for line in sys.stdin:
-            parts = line.split()
-            if len(parts) > 6:
-                try:
-                    status_code = int(parts[-2])
-                    file_size = int(parts[-1])
-                    total_size += file_size
+try:
+    for line in sys.stdin:
+        parsed_line = line.split()  # ✄ trimming
+        parsed_line = parsed_line[::-1]  # inverting
 
-                    if status_code in status_codes:
-                        status_codes[status_code] += 1
+        if len(parsed_line) > 2:
+            counter += 1
 
-                except ValueError:
-                    continue
+            if counter <= 10:
+                total_file_size += int(parsed_line[0])  # file size
+                code = parsed_line[1]  # status code
 
-                line_count += 1
+                if (code in dict_sc.keys()):
+                    dict_sc[code] += 1
 
-                if line_count % 10 == 0:
-                    print_stats(total_size, status_codes)
+            if (counter == 10):
+                print_msg(dict_sc, total_file_size)
+                counter = 0
 
-    except KeyboardInterrupt:
-        print_stats(total_size, status_codes)
-        raise
-
-    print_stats(total_size, status_codes)
-
-
-if __name__ == "__main__":
-    log_parsing()
+finally:
+    print_msg(dict_sc, total_file_size)
