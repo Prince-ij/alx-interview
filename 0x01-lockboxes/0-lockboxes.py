@@ -8,7 +8,8 @@ def canUnlockAll(boxes):
     """
     Determines if all boxes can be unlocked.
 
-    :param boxes: List of lists, where each sublist contains keys for other boxes.
+    :param boxes: List of lists, where each sublist contains key
+    s for other boxes.
     :type boxes: list
     :return: True if all boxes can be unlocked, otherwise False.
     :rtype: bool
